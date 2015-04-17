@@ -20,9 +20,9 @@ var debris_objs = {
 }
 //R/B DEB
 
-//var debris_data = './data/all.txt';
-//var debris_data = './data/small.txt';
-var debris_data = './data/check.txt';
+//var debris_data = 'http://debris-ar.smellman.org/data/all.txt';
+//var debris_data = 'http://debris-ar.smellman.org/data/small.txt';
+var debris_data = 'http://debris-ar.smellman.org/data/check.txt';
 
 var test = {
     name: "VANGUARD 1",
@@ -93,7 +93,7 @@ Debris.prototype.init = function(i) {
                 var position = new Cesium.Cartesian3(loc.x * 1000, loc.y * 1000, loc.z * 1000);
                 that.entity.position = position;
             }
-            
+
         };
     }
 };
@@ -124,7 +124,7 @@ var loadDebrisText = function(viewer, url) {
         viewer.clock.onTick.addEventListener(clockev);
     }).otherwise(function(error) {
     });
-    
+
 };
 
 //make_loc(viewer, test);
@@ -134,5 +134,5 @@ loadDebrisText(viewer, debris_data);
 
 var debris_action = function(debris_id) {
     //30.39096, 130.96813 tanegashima
-    
+
 };
