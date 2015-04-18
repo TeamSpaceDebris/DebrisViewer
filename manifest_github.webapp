@@ -1,0 +1,14 @@
+{
+  "name": "DearMySpaceDebris",
+  "description": "A Hello World app",
+  "launch_path": "/DebrisViewer/index.html",
+  "icons": {
+    "16": "/DebrisViewer/icons/icon16x16.png",
+    "48": "/DebrisViewer/icons/icon48x48.png",
+    "60": "/DebrisViewer/icons/icon60x60.png",
+    "128": "/DebrisViewer/icons/icon128x128.png"
+  },
+  "type": "web",
+  "permissions": {
+  }
+}
