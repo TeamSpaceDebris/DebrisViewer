@@ -1,9 +1,35 @@
+var parseQueryString = function () {
+    var res = null,
+      query, parameters, element, name, value;
+    if (1 < document.location.search.length) {
+        query = document.location.search.substring(1);
+        parameters = query.split('&');
+        res = {};
+        for (var i = 0; i < parameters.length; i++) {
+            element = parameters[i].split('=');
+            name = decodeURIComponent(element[0]);
+            value = decodeURIComponent(element[1]);
+            if (value.indexOf("/") == value.length - 1) {
+                value = value.slice(0, value.length - 1);
+            }
+            res[name] = decodeURIComponent(value);
+        }
+        return res;
+    }
+    return null;
+};
+
 var viewer = new Cesium.Viewer('cesiumContainer');
 
 console.log(Cesium.JulianDate.toDate(viewer.clock.currentTime));
 var debris_obj = './models/hammer.gltf';
 
 var seki = false;
+var queryString = parseQueryString();
+if (queryString && queryString.seki == "true") {
+    seki = true;
+}
+
 var debris_objs = {
     "hammer": {
         model: './models/hammer.gltf',
@@ -23,6 +49,16 @@ var debris_objs = {
 //var debris_data = 'http://debris-ar.smellman.org/data/all.txt';
 //var debris_data = 'http://debris-ar.smellman.org/data/small.txt';
 var debris_data = 'http://debris-ar.smellman.org/data/check.txt';
+if (queryString && queryString.data_type) {
+    console.log(queryString.data_type);
+    if (queryString.data_type == "check") {
+        debris_data = 'http://debris-ar.smellman.org/data/check.txt';
+    } else if (queryString.data_type == "small") {
+        debris_data = 'http://debris-ar.smellman.org/data/small.txt';
+    } else if (queryString.data_type == "all") {
+        debris_data = 'http://debris-ar.smellman.org/data/all.txt';
+    }
+}
 
 var test = {
     name: "VANGUARD 1",
@@ -95,13 +131,49 @@ Debris.prototype.init = function(i) {
             }
 
         };
+        this.entity.getLocation = function(clock) {
+            return that.rectangular(clock);
+        }
+        this.entity.promiseLocation = function(clock) {
+            return new Promise(function (resolve, reject) {
+                var loc = that.rectangular(clock);
+                if (loc) {
+                    resolve(loc);
+                } else {
+                    reject();
+                }
+            });
+        }
     }
 };
 
 
 var clockev = function(clock) {
+    /* 素直な実装パターン
     viewer.entities.values.forEach(function(entity) {
         entity.updateLocation(clock);
+    });
+    */
+    /* reduce+promise
+    viewer.entities.values.reduce(function(sequence, entity) {
+        return sequence.then(function() {
+            return entity.getLocation(clock);
+        }).then(function(loc) {
+            if (loc) {
+                position = new Cesium.Cartesian3(loc.x * 1000, loc.y * 1000, loc.z * 1000);
+                entity.position = position;
+            }
+        })
+    }, Promise.resolve());
+*/
+    /* promiseオブジェクトを返してみるパターン、一番わかりやすい */
+    viewer.entities.values.forEach(function (entity) {
+        entity.promiseLocation(clock).then(function (loc) {
+            var position = new Cesium.Cartesian3(loc.x * 1000, loc.y * 1000, loc.z * 1000);
+            entity.position = position;
+        }).catch(function () {
+            // do nothing
+        });
     });
     viewer.dataSourceDisplay.update(clock);
 };
@@ -111,7 +183,6 @@ var loadDebrisText = function(viewer, url) {
     }).then(function(text) {
         var lines = text.split('\n');
         for(var i = 0; i < lines.length - 1; i += 3) {
-            console.log(i, lines.length);
             var tle = {
                 name: lines[i],
                 first_line: lines[i + 1],
