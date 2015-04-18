@@ -107,7 +107,7 @@ Debris.prototype.init = function(i) {
             obj = debris_objs["seki"];
         }
         var position = new Cesium.Cartesian3(loc.x * 1000, loc.y * 1000, loc.z * 1000);
-        var heading = Cesium.Math.toRadians(135);
+        var heading = Cesium.Math.toRadians(270);
         var pitch = 0;
         var roll = 0;
         var orientation = Cesium.Transforms.headingPitchRollQuaternion(position, heading, pitch, roll);
