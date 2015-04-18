@@ -19,7 +19,13 @@ var parseQueryString = function () {
     return null;
 };
 
-var viewer = new Cesium.Viewer('cesiumContainer');
+var viewer = new Cesium.Viewer('cesiumContainer', {
+    imageryProvider: new Cesium.OpenStreetMapImageryProvider({
+      url: 'http://otile1-s.mqcdn.com/tiles/1.0.0/osm/',
+      credit: new Cesium.Credit('OpenStreetMap (OSM) is a collaborative project to create a                                                                                                                                                                                                                                                                               free editable map of the world.', '', '')
+    }),
+    baseLayerPicker: false
+  });
 
 console.log(Cesium.JulianDate.toDate(viewer.clock.currentTime));
 var debris_obj = './models/hammer.gltf';
@@ -215,7 +221,7 @@ var loadDebrisText = function(viewer, url) {
             //make_loc(viewer, tle);
             if (show_payload || tle.name.indexOf("DEB") != -1 || tle.name.indexOf("R/B") != -1) {
                 var debris = new Debris(viewer, tle, debris_obj);
-                debris.init(i);                
+                debris.init(i);
             }
         }
         viewer.clock.onTick.addEventListener(clockev);
