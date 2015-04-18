@@ -19,13 +19,7 @@ var parseQueryString = function () {
     return null;
 };
 
-var viewer = new Cesium.Viewer('cesiumContainer', {
-    imageryProvider: new Cesium.OpenStreetMapImageryProvider({
-      url: 'http://otile1-s.mqcdn.com/tiles/1.0.0/osm/',
-      credit: new Cesium.Credit('OpenStreetMap (OSM) is a collaborative project to create a                                                                                                                                                                                                                                                                               free editable map of the world.', '', '')
-    }),
-    baseLayerPicker: false
-  });
+var viewer = new Cesium.Viewer('cesiumContainer');
 
 console.log(Cesium.JulianDate.toDate(viewer.clock.currentTime));
 var debris_obj = './models/hammer.gltf';
@@ -117,9 +111,8 @@ Debris.prototype.rectangular = function(clock) {
 
 Debris.prototype.description = function(i) {
     var id = "debris" + i.toString();
-    var text = "<h2>12025A,GCOM-W1 (SHIZUKU)</h2><p><b>GCOM-W1</b> (Global Change Observation Mission-Water), a Japanese satellite, was launched from Tanegashima on 2012 May 17 at 16:39 UT by an H-2A rocket. The JAXA satellite, nicknamed <b>SHIZUKU</b>, which in Japanese means water drop, weighed 1.99 tons. It's the first satellite for the GCOM-W series which will study water circulation systems in the Earth's atmosphere. The <b>GCOM-W1</b> will track precipitation, clouds, atmospheric water vapor, sea surface temperatures, sea ice, snow cover, and soil moisture. GCOM-W1 carries the Advanced Microwave Scanning Radiometer 2 (AMSR2), a remote sensing instrument for measuring weak microwave emission from the surface and the atmosphere of the Earth. It is expected to operate in orbit for at least 5 years.</p><p>The initial orbital parameters were period = 98.75 minutes, apogee = 700.0 km, perigee = 697.9 km, inclination = 98.2° on 2012 Jun 24 at 20:32:06 UTC.</p><ul><li>Launch Date: 2012 May 17 at 16:39:00 UTC</li><li>Launch Site: <a href=\"http://maps.gsi.go.jp/#14/30.391830/130.957031\" target=\"_blank\">Tanegashima, Japan</a></li><li>Launch Vehicle: H-2A</li></ul>";
-    var ret = text + "<p><a href='#' onclick=\"debris_action('" + id + "');\">action</a></p>";
-    return ret;
+    var text = "<h2>12025A,GCOM-W1 (SHIZUKU)</h2><p><b>GCOM-W1</b> (Global Change Observation Mission-Water), a Japanese satellite, was launched from Tanegashima on 2012 May 17 at 16:39 UT by an H-2A rocket. The JAXA satellite, nicknamed <b>SHIZUKU</b>, which in Japanese means water drop, weighed 1.99 tons. It's the first satellite for the GCOM-W series which will study water circulation systems in the Earth's atmosphere. The <b>GCOM-W1</b> will track precipitation, clouds, atmospheric water vapor, sea surface temperatures, sea ice, snow cover, and soil moisture. GCOM-W1 carries the Advanced Microwave Scanning Radiometer 2 (AMSR2), a remote sensing instrument for measuring weak microwave emission from the surface and the atmosphere of the Earth. It is expected to operate in orbit for at least 5 years.</p><p>The initial orbital parameters were period = 98.75 minutes, apogee = 700.0 km, perigee = 697.9 km, inclination = 98.2° on 2012 Jun 24 at 20:32:06 UTC.</p><ul><li>Launch Date: 2012 May 17 at 16:39:00 UTC</li><li>Launch Site: <a href=\"http://www.openstreetmap.org/?mlat=30.4&mlon=130.97&zoom=15#map=15/30.4000/130.9700\" target=\"_blank\">Tanegashima, Japan</a></li><li>Launch Vehicle: H-2A</li></ul>";
+    return text;
 }
 
 Debris.prototype.init = function(i) {
@@ -237,5 +230,25 @@ loadDebrisText(viewer, debris_data);
 
 var debris_action = function(debris_id) {
     //30.39096, 130.96813 tanegashima
+
+};
+
+var goto_tanegashima = function() {
+    //30.39096, 130.96813
+    var lat = 30.3918330;
+    var lng = 130.957031;
+    var heading = Cesium.Math.toRadians(0);
+    var pitch = Cesium.Math.toRadians(0);
+    var range = 100;
+
+    var center = Cesium.Cartesian3.fromDegrees(lng, lat);
+    var boundingSphere = new Cesium.BoundingSphere(center, range);
+    var headingPitchRange = new Cesium.HeadingPitchRange(heading, pitch, range);
+
+    viewer.camera.constrainedAxis = Cesium.Cartesian3.UNIT_Z;
+    viewer.camera.flyToBoundingSphere(boundingSphere,{
+        duration : 5.0,
+        offset : headingPitchRange
+    });
 
 };
