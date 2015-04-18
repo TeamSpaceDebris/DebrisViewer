@@ -42,6 +42,22 @@ var debris_objs = {
     "seki": {
         model: './models/seki.gltf',
         scale: 200000.0
+    },
+    "payload4": {
+        model: './models/payload4.gltf',
+        scale: 200000.0
+    },
+    "astro": {
+        model: './models/astro.gltf',
+        scale: 200000.0
+    },
+    "ods": {
+        model: './models/ods.gltf',
+        scale: 100000.0
+    },
+    "srb": {
+        model: './models/srb.gltf',
+        scale: 200000.0
     }
 }
 //R/B DEB
@@ -57,6 +73,12 @@ if (queryString && queryString.data_type) {
         debris_data = 'http://debris-ar.smellman.org/data/small.txt';
     } else if (queryString.data_type == "all") {
         debris_data = 'http://debris-ar.smellman.org/data/all.txt';
+    }
+}
+var show_payload = true;
+if (queryString && queryString.show_payload) {
+    if (queryString.show_payload == "false") {
+        show_payload = false;
     }
 }
 
@@ -98,10 +120,12 @@ Debris.prototype.init = function(i) {
     var loc = this.rectangular();
     if (loc) {
         var obj;
-        if (this.satellite.orbital_elements.name.search("DEB") != -1) {
+        if (this.satellite.orbital_elements.name.indexOf("DEB") != -1) {
             obj = debris_objs["hammer"];
+        } else if (this.satellite.orbital_elements.name.indexOf("R/B") != -1) {
+            obj = debris_objs["payload4"];
         } else {
-            obj = debris_objs["glove"];
+            obj = debris_objs["ods"];
         }
         if (seki) {
             obj = debris_objs["seki"];
@@ -189,8 +213,10 @@ var loadDebrisText = function(viewer, url) {
                 second_line: lines[i + 2]
             };
             //make_loc(viewer, tle);
-            var debris = new Debris(viewer, tle, debris_obj);
-            debris.init(i);
+            if (show_payload || tle.name.indexOf("DEB") != -1 || tle.name.indexOf("R/B") != -1) {
+                var debris = new Debris(viewer, tle, debris_obj);
+                debris.init(i);                
+            }
         }
         viewer.clock.onTick.addEventListener(clockev);
     }).otherwise(function(error) {
